@@ -181,7 +181,7 @@
         <div class="chips" id="chips"><button>5</button><button>10</button><button>20</button><button>50</button><button>100</button></div>
         <div class="quote" id="quote"><span class="muted">Enter your name and an amount to see your payout.</span></div>
         <button class="btn full" id="book" disabled>Place bet</button>
-        <p class="muted" style="font-size:13px;margin:10px 0 0">Pay John by Venmo or cash after you bet. Unpaid bets can be cancelled.</p>
+        <p class="muted" style="font-size:13px;margin:10px 0 0">We'll settle up with John at the end.</p>
       </div>
       <div id="guestInfo">
         <h2>How to bet</h2>
@@ -226,16 +226,9 @@
       <thead><tr><th>Name</th><th class="n">Bet</th><th class="n">Payout</th><th class="n">Net</th></tr></thead>
       <tbody id="resBody"></tbody>
     </table>
-    <div class="controls" id="copyRow"><button class="btn ghost" id="copyRes">Copy for Venmo</button><span class="muted" id="copyMsg" style="align-self:center;font-size:13px"></span></div>
+    <div class="controls" id="copyRow"><button class="btn ghost" id="copyRes">Copy settle-up list</button><span class="muted" id="copyMsg" style="align-self:center;font-size:13px"></span></div>
   </section>
 
-  <details class="card">
-    <summary>How the prices work</summary>
-    <div class="how">
-      <p>Boy and Girl prices add up to about $1.02, and John keeps the 2¢. The starting price is 51% Boy, since slightly more boys are born than girls.</p>
-      <p>After each bet, the side that took the money gets a little more expensive. The more one-sided the betting gets, the more the price moves. Your bet fills at the price on the board when you place it, whatever the size.</p>
-    </div>
-  </details>
   <div style="text-align:center;margin-top:22px"><a href="#" id="hostLink" style="color:var(--muted);font-size:13px">Host sign-in</a></div>
 </div>
 
