@@ -446,7 +446,7 @@ function drawCrowd(sorted){
     `<div class="cg">Girl<b>${ppl.girl.size} ${ppl.girl.size===1?'person':'people'}</b>${money(usd.girl)} bet</div>`;
 }
 function drawNet(sorted){
-  const svg = $('midChart'), W = 340, H = 150, L = 44, R = 8, T = 10, B = 22;
+  const svg = $('midChart'), W = 340, H = 150, L = 62, R = 8, T = 10, B = 22;
   const now = Date.now();
   const tStart = sorted.length ? (sorted[0].ts||now) - 60000 : now - 3600000;
   const tEnd = Math.max(now, sorted.length ? sorted[sorted.length-1].ts||now : now);
