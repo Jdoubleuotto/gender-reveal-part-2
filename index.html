@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Boy or Girl? The Baby Market</title>
+<title>Gender Reveal Part 2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -131,9 +131,9 @@
   <div class="banner" id="banner"></div>
 
   <header>
-    <div class="eyebrow">Karen &amp; Andrew's Gender Reveal</div>
-    <h1><span class="b">Boy</span> <span class="or">or</span> <span class="g">Girl?</span></h1>
-    <div class="sub">Tessa is getting a brother or a sister. Bet on which one.</div>
+    <div class="eyebrow">Karen &amp; Andrew</div>
+    <h1><span class="b">Gender Reveal</span> <span class="g">Part 2</span></h1>
+    <div class="sub">Boy or girl? Tessa is getting a brother or a sister. Bet on which one.</div>
     <div class="status"><span class="dot" id="statusDot"></span><span id="statusText">Betting is open</span></div>
     <img class="hero" src="hero.jpg" alt="Tessa holding hands with a pink and a blue silhouette under a question mark">
   </header>
@@ -168,8 +168,8 @@
   <section class="grid">
     <div class="card" id="betCard">
       <div id="hostForm" style="display:none">
-        <h2>Book a bet</h2>
-        <label class="f" for="name">Who's betting</label>
+        <h2>Place a bet</h2>
+        <label class="f" for="name">Your name</label>
         <input type="text" id="name" placeholder="e.g. Aunt Linda" autocomplete="off">
         <label class="f">Side</label>
         <div class="toggle">
@@ -179,12 +179,13 @@
         <label class="f" for="amt">Amount ($)</label>
         <input type="number" id="amt" min="1" step="1" inputmode="decimal" placeholder="20">
         <div class="chips" id="chips"><button>5</button><button>10</button><button>20</button><button>50</button><button>100</button></div>
-        <div class="quote" id="quote"><span class="muted">Enter a name and an amount to see the fill.</span></div>
-        <button class="btn full" id="book" disabled>Book bet</button>
+        <div class="quote" id="quote"><span class="muted">Enter your name and an amount to see your payout.</span></div>
+        <button class="btn full" id="book" disabled>Place bet</button>
+        <p class="muted" style="font-size:13px;margin:10px 0 0">Pay John by Venmo or cash after you bet. Unpaid bets can be cancelled.</p>
       </div>
       <div id="guestInfo">
         <h2>How to bet</h2>
-        <p class="how">Tell John which side you want and how much. Each Yes pays $1 if you're right. At 52¢, a $10 bet on Boy pays $19.23 if it's a boy.</p>
+        <p class="how">Each Yes pays $1 if you're right. At 52¢, a $10 bet on Boy pays $19.23 if it's a boy.</p>
         <p class="how">Prices change after each bet. The side getting more money costs more, and the other side gets cheaper. Up to <span id="capGuest">$500</span> per person.</p>
       </div>
     </div>
@@ -232,7 +233,7 @@
     <summary>How the prices work</summary>
     <div class="how">
       <p>Boy and Girl prices add up to about $1.02, and John keeps the 2¢. The starting price is 51% Boy, since slightly more boys are born than girls.</p>
-      <p>After each bet, the side that took the money gets a little more expensive. The more one-sided the betting gets, the more the price moves. Your bet fills at the price on the board when John books it, whatever the size.</p>
+      <p>After each bet, the side that took the money gets a little more expensive. The more one-sided the betting gets, the more the price moves. Your bet fills at the price on the board when you place it, whatever the size.</p>
     </div>
   </details>
   <div style="text-align:center;margin-top:22px"><a href="#" id="hostLink" style="color:var(--muted);font-size:13px">Host sign-in</a></div>
@@ -390,11 +391,9 @@ function render(){
   }
 
   // host
-  $('hostForm').style.display = isHost && st === 'open' ? 'block' : 'none';
-  $('guestInfo').style.display = isHost && st === 'open' ? 'none' : 'block';
-  if (isHost && st !== 'open'){
-    $('guestInfo').querySelector('h2').textContent = revealed ? 'Market settled' : 'Betting closed';
-  } else $('guestInfo').querySelector('h2').textContent = 'How to bet';
+  $('hostForm').style.display = st === 'open' ? 'block' : 'none';
+  $('guestInfo').style.display = st === 'open' ? 'none' : 'block';
+  $('guestInfo').querySelector('h2').textContent = revealed ? 'Market settled' : 'Betting is closed';
 
   $('hostPanel').style.display = isHost ? 'block' : 'none';
   if (isHost){
@@ -449,10 +448,10 @@ function drawSpark(hist){
 
 function updateQuote(){
   const box = $('quote'), btn = $('book');
-  if (!isHost || config.status !== 'open'){ btn.disabled = true; return; }
+  if (config.status !== 'open'){ btn.disabled = true; return; }
   const name = $('name').value.trim();
   const amt = parseFloat($('amt').value);
-  if (!name || !(amt > 0)){ box.innerHTML = '<span class="muted">Enter a name and an amount to see the fill.</span>'; btn.disabled = true; return; }
+  if (!name || !(amt > 0)){ box.innerHTML = '<span class="muted">Enter your name and an amount to see your payout.</span>'; btn.disabled = true; return; }
   const cap = config.perPersonCap || 500;
   const room = Math.max(0, cap - stakedBy(name));
   const want = Math.min(amt, room);
@@ -467,7 +466,7 @@ function updateQuote(){
     (notes.length ? `<br><span class="warn">${notes.join(' ')}</span>` : '');
   btn.disabled = busy;
   btn.className = 'btn full ' + side;
-  btn.textContent = `Book ${money(f.spent)} on ${side === 'boy' ? 'Boy' : 'Girl'}`;
+  btn.textContent = `Bet ${money(f.spent)} on ${side === 'boy' ? 'Boy' : 'Girl'}`;
 }
 
 /* ---------- events ---------- */
@@ -485,12 +484,14 @@ $('book').onclick = async () => {
   const room = Math.max(0, (config.perPersonCap||500) - stakedBy(name));
   const { s } = replay();
   const f = fill(s, side, Math.min(amt, room));
-  if (f.spent <= 0) return;
+  if (f.spent < 1){ showBanner('Minimum bet is $1.'); return; }
   busy = true; $('book').disabled = true;
   try{
-    await addTrade({ name, side, stake:f.spent, contracts:Math.round(f.contracts*10000)/10000, avgPrice:Math.round(f.avg*10000)/10000, ts:Date.now() });
-    $('name').value = ''; $('amt').value = '';
-  } catch(e){ showBanner('That bet did not save. Check your connection and try again.'); }
+    await addTrade({ name, side, stake:f.spent, contracts:f.contracts, avgPrice:f.avg, ts:Date.now() });
+    try{ localStorage.setItem('brName', name); }catch(e){}
+    $('amt').value = ''; showBanner('');
+    if (!isHost) $('name').value = name;
+  } catch(e){ showBanner('That bet did not go through. Betting may be closed, or the price moved. Try again.'); }
   busy = false; updateQuote();
 };
 
@@ -536,6 +537,7 @@ function confetti(outcome){
 }
 
 /* ---------- boot ---------- */
+try{ const n = localStorage.getItem('brName'); if (n) $('name').value = n; }catch(e){}
 render();
 let gotTrades = false;
 const loadTimer = setTimeout(() => { if (!gotTrades) showBanner("Can't reach the market yet. Check your connection."); }, 10000);
