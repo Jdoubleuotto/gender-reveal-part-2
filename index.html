@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boy or Girl? The Baby Market</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF7F2; --card:#FFFFFF; --ink:#2B2530; --muted:#7A7180; --line:#ECE4DA;
+    --boy:#3F78BF; --boy-soft:#E3EDF9; --boy-deep:#2A5A96;
+    --girl:#D45F86; --girl-soft:#FBE3EB; --girl-deep:#A8406A;
+    --gold:#C9A24B; --ok:#2E8B57; --bad:#C0392B;
+    --r:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{background:
+    radial-gradient(900px 500px at 0% -10%, #EAF1FB 0%, transparent 60%),
+    radial-gradient(900px 500px at 100% -10%, #FCE8EF 0%, transparent 60%), var(--bg);}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 60px}
+  .banner{display:none;margin-bottom:16px;padding:10px 14px;border-radius:12px;background:#FFF4DA;border:1px solid #F0DDA8;font-size:14px;color:#6B5320}
+  header{text-align:center;margin:8px 0 26px}
+  .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  h1{font-family:Fraunces,serif;font-weight:800;font-size:clamp(38px,7vw,68px);line-height:1.02;margin:10px 0 8px;letter-spacing:-.02em}
+  h1 .b{color:var(--boy)} h1 .g{color:var(--girl)} h1 .or{font-weight:400;font-style:italic;color:var(--muted);font-size:.6em}
+  .sub{color:var(--muted);font-size:16px}
+  .hero{display:block;width:100%;max-width:572px;margin:22px auto 0;border-radius:24px;border:1px solid var(--line);box-shadow:0 10px 30px rgba(43,37,48,.08)}
+  .status{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:13px;font-weight:600}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(46,139,87,.15)}
+  .dot.closed{background:var(--gold);box-shadow:0 0 0 4px rgba(201,162,75,.18)}
+  .dot.revealed{background:var(--girl)}
+
+  .board{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .side{position:relative;border-radius:24px;padding:26px 26px 22px;overflow:hidden;border:1px solid var(--line);background:var(--card)}
+  .side.boy{background:linear-gradient(160deg,var(--boy-soft),#fff 70%)}
+  .side.girl{background:linear-gradient(200deg,var(--girl-soft),#fff 70%)}
+  .side .label{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+  .boy .label{color:var(--boy-deep)} .girl .label{color:var(--girl-deep)}
+  .price{font-family:Fraunces,serif;font-weight:800;font-size:clamp(56px,10vw,92px);line-height:1;margin:10px 0 4px;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .boy .price{color:var(--boy)} .girl .price{color:var(--girl)}
+  .price small{font-size:.38em;font-weight:600;margin-left:2px}
+  .payline{display:inline-block;margin-top:14px;padding:10px 16px;border-radius:12px;background:#fff;border:2px solid #111;color:#111;font-weight:700;font-size:19px;font-variant-numeric:tabular-nums}
+  .tag{position:absolute;top:18px;right:18px;font-size:11px;font-weight:700;padding:5px 9px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--muted)}
+  .tag.full{color:var(--bad);border-color:#F1C7C2;background:#FFF5F4}
+  .side.win{outline:3px solid var(--gold);outline-offset:-3px}
+  .side.lose{opacity:.55}
+
+  .meter{margin:18px 0 26px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+  .meter-top{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;margin-bottom:10px}
+  .meter-top b{font-weight:700}
+  .bar{height:14px;border-radius:999px;overflow:hidden;display:flex;background:var(--girl-soft)}
+  .bar .fill-b{background:linear-gradient(90deg,var(--boy-deep),var(--boy));transition:width .6s cubic-bezier(.2,.8,.2,1)}
+  .bar .fill-g{flex:1;background:linear-gradient(90deg,var(--girl),var(--girl-deep))}
+  .spark{margin-top:12px;height:56px;width:100%}
+
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+  .card h2{font-family:Fraunces,serif;font-size:22px;margin:0 0 14px;font-weight:600}
+  .muted{color:var(--muted)}
+  label.f{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:12px 0 6px;letter-spacing:.04em;text-transform:uppercase}
+  input[type=text],input[type=number]{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);font:inherit;font-size:16px;background:#FDFBF8;color:var(--ink)}
+  input:focus{outline:2px solid #CFC3B5;outline-offset:1px}
+  .toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .toggle button{padding:14px;border-radius:12px;border:2px solid var(--line);background:#fff;font:inherit;font-weight:700;font-size:15px;cursor:pointer;color:var(--muted)}
+  .toggle button.on.boy{border-color:var(--boy);background:var(--boy-soft);color:var(--boy-deep)}
+  .toggle button.on.girl{border-color:var(--girl);background:var(--girl-soft);color:var(--girl-deep)}
+  .chips{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .chips button{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font:inherit;font-size:13px;cursor:pointer}
+  .quote{margin-top:14px;padding:12px 14px;border-radius:12px;background:#F7F2EC;font-size:14px;line-height:1.55;min-height:48px}
+  .quote .warn{color:var(--bad);font-weight:600}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;border:0;font:inherit;font-weight:700;font-size:15px;cursor:pointer;background:var(--ink);color:#fff}
+  .btn.full{width:100%;margin-top:14px}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.boy{background:var(--boy)} .btn.girl{background:var(--girl)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.armed{background:var(--bad);color:#fff}
+
+  .feed{list-style:none;margin:0;padding:0;max-height:420px;overflow:auto}
+  .feed li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .feed li:last-child{border-bottom:0}
+  .pill{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff}
+  .pill.boy{background:var(--boy)} .pill.girl{background:var(--girl)}
+  .feed .who{font-weight:600}
+  .feed .meta{color:var(--muted);font-size:12px}
+  .feed .amt{margin-left:auto;text-align:right;font-variant-numeric:tabular-nums}
+  .x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:8px}
+  .x:hover{background:#F4EEE7;color:var(--bad)}
+  .x.armed{color:#fff;background:var(--bad);font-size:11px;font-weight:700}
+
+  .host{margin-top:16px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .stat{background:#FAF6F1;border-radius:12px;padding:12px}
+  .stat .k{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .stat .v{font-family:Fraunces,serif;font-size:24px;font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums}
+  .pos{color:var(--ok)} .neg{color:var(--bad)}
+  .ubar{height:10px;border-radius:999px;background:#F1EBE4;overflow:hidden;margin-top:8px}
+  .ubar div{height:100%;background:linear-gradient(90deg,#9FC59F,var(--gold),var(--bad));transition:width .5s}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .row{display:flex;gap:10px;align-items:end}
+  .row > *{flex:1}
+
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}
+  th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+
+  .reveal{display:none;text-align:center;margin:0 0 22px;padding:28px;border-radius:24px;color:#fff}
+  .reveal.boy{background:linear-gradient(135deg,var(--boy-deep),var(--boy))}
+  .reveal.girl{background:linear-gradient(135deg,var(--girl-deep),var(--girl))}
+  .reveal h2{font-family:Fraunces,serif;font-size:clamp(40px,8vw,72px);margin:0;font-weight:800}
+  .reveal p{margin:6px 0 0;opacity:.9}
+
+  details{margin-top:16px}
+  summary{cursor:pointer;font-weight:600}
+  .how{font-size:14px;line-height:1.65;color:#4A4350}
+  .how code{background:#F4EEE7;padding:1px 6px;border-radius:6px;font-size:13px}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+  .empty{color:var(--muted);font-size:14px;padding:12px 0}
+  @media (max-width:760px){
+    .board,.grid{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <div class="banner" id="banner"></div>
+
+  <header>
+    <div class="eyebrow">Karen &amp; Andrew's Gender Reveal</div>
+    <h1><span class="b">Boy</span> <span class="or">or</span> <span class="g">Girl?</span></h1>
+    <div class="sub">Tessa is getting a brother or a sister. Bet on which one.</div>
+    <div class="status"><span class="dot" id="statusDot"></span><span id="statusText">Betting is open</span></div>
+    <img class="hero" src="hero.jpg" alt="Tessa holding hands with a pink and a blue silhouette under a question mark">
+  </header>
+
+  <div class="reveal" id="reveal"><h2 id="revealTitle"></h2><p id="revealSub"></p></div>
+
+  <section class="board">
+    <div class="side boy" id="sideBoy">
+      <span class="tag" id="tagBoy">Yes · Boy</span>
+      <div class="label">Yes on Boy</div>
+      <div class="price" id="priceBoy">52<small>¢</small></div>
+      <div class="payline" id="payBoy">$10 bet wins $19.23</div>
+    </div>
+    <div class="side girl" id="sideGirl">
+      <span class="tag" id="tagGirl">Yes · Girl</span>
+      <div class="label">Yes on Girl</div>
+      <div class="price" id="priceGirl">50<small>¢</small></div>
+      <div class="payline" id="payGirl">$10 bet wins $20.00</div>
+    </div>
+  </section>
+
+  <section class="meter">
+    <div class="meter-top">
+      <span><b id="mBoy">51%</b> <span class="muted">Boy</span></span>
+      <span class="muted" id="mCount">No bets yet</span>
+      <span><span class="muted">Girl</span> <b id="mGirl">49%</b></span>
+    </div>
+    <div class="bar"><div class="fill-b" id="fillB" style="width:51%"></div><div class="fill-g"></div></div>
+    <svg class="spark" id="spark" viewBox="0 0 300 56" preserveAspectRatio="none"></svg>
+  </section>
+
+  <section class="grid">
+    <div class="card" id="betCard">
+      <div id="hostForm" style="display:none">
+        <h2>Book a bet</h2>
+        <label class="f" for="name">Who's betting</label>
+        <input type="text" id="name" placeholder="e.g. Aunt Linda" autocomplete="off">
+        <label class="f">Side</label>
+        <div class="toggle">
+          <button class="boy on" data-side="boy" id="tBoy">Yes · Boy</button>
+          <button class="girl" data-side="girl" id="tGirl">Yes · Girl</button>
+        </div>
+        <label class="f" for="amt">Amount ($)</label>
+        <input type="number" id="amt" min="1" step="1" inputmode="decimal" placeholder="20">
+        <div class="chips" id="chips"><button>5</button><button>10</button><button>20</button><button>50</button><button>100</button></div>
+        <div class="quote" id="quote"><span class="muted">Enter a name and an amount to see the fill.</span></div>
+        <button class="btn full" id="book" disabled>Book bet</button>
+      </div>
+      <div id="guestInfo">
+        <h2>How to bet</h2>
+        <p class="how">Tell John which side you want and how much. Each Yes pays $1 if you're right. At 52¢, a $10 bet on Boy pays $19.23 if it's a boy.</p>
+        <p class="how">Prices change after each bet. The side getting more money costs more, and the other side gets cheaper. Up to <span id="capGuest">$500</span> per person.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Bets</h2>
+      <ul class="feed" id="feed"></ul>
+    </div>
+  </section>
+
+  <section class="card host" id="hostPanel" style="display:none">
+    <h2>Market maker</h2>
+    <div class="stats">
+      <div class="stat"><div class="k">Collected</div><div class="v" id="sPrem">$0</div></div>
+      <div class="stat"><div class="k">If Boy, you</div><div class="v" id="sIfBoy">$0</div></div>
+      <div class="stat"><div class="k">If Girl, you</div><div class="v" id="sIfGirl">$0</div></div>
+      <div class="stat"><div class="k">Skew</div><div class="v" id="sSkew">0.0</div></div>
+    </div>
+    <div style="margin-top:14px;font-size:14px">
+      <span id="uText">Risk used: 0% of $1,000</span>
+      <div class="ubar"><div id="uBar" style="width:0%"></div></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <div><label class="f" for="cap">Per-person limit ($)</label><input type="number" id="cap" min="1" step="1"></div>
+      <div></div>
+    </div>
+    <div class="controls">
+      <button class="btn ghost" id="toggleOpen">Close betting</button>
+      <button class="btn boy" id="revealBoy" data-confirm="Tap again: it's a Boy">Reveal: Boy</button>
+      <button class="btn girl" id="revealGirl" data-confirm="Tap again: it's a Girl">Reveal: Girl</button>
+      <button class="btn ghost" id="undoReveal" style="display:none" data-confirm="Tap again to undo">Undo reveal</button>
+    </div>
+  </section>
+
+  <section class="card host" id="results" style="display:none">
+    <h2>Settle up</h2>
+    <table>
+      <thead><tr><th>Name</th><th class="n">Bet</th><th class="n">Payout</th><th class="n">Net</th></tr></thead>
+      <tbody id="resBody"></tbody>
+    </table>
+    <div class="controls" id="copyRow"><button class="btn ghost" id="copyRes">Copy for Venmo</button><span class="muted" id="copyMsg" style="align-self:center;font-size:13px"></span></div>
+  </section>
+
+  <details class="card">
+    <summary>How the prices work</summary>
+    <div class="how">
+      <p>Boy and Girl prices add up to about $1.02, and John keeps the 2¢. The starting price is 51% Boy, since slightly more boys are born than girls.</p>
+      <p>After each bet, the side that took the money gets a little more expensive. The more one-sided the betting gets, the more the price moves. Your bet fills at the price on the board when John books it, whatever the size.</p>
+    </div>
+  </details>
+  <div style="text-align:center;margin-top:22px"><a href="#" id="hostLink" style="color:var(--muted);font-size:13px">Host sign-in</a></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, doc, addDoc, deleteDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+const fbApp = initializeApp({ apiKey:"AIzaSyDkG9F-c0HMlir47bfITcPsbxKlBQmvfSE", authDomain:"tessa-reveal.firebaseapp.com", projectId:"tessa-reveal", storageBucket:"tessa-reveal.firebasestorage.app", messagingSenderId:"98783861209", appId:"1:98783861209:web:ce5e12be4c5f6e605ca1c8" });
+const fs = getFirestore(fbApp);
+const auth = getAuth(fbApp);
+const HOST_EMAIL = "jwott135@gmail.com";
+const P = { FAIR:0.51, MAXLOSS:1000, SCALE:0.063, CAP:0.035, K:4, HALF:0.01, WIDEN:0.02, CHUNK:0.25 };
+const DEFAULT_CONFIG = { status:'open', outcome:null, perPersonCap:500 };
+
+let db = null, user = null, isHost = false, live = false;
+let trades = [];
+let config = { ...DEFAULT_CONFIG };
+let side = 'boy';
+let busy = false;
+let confettiDone = false;
+let lastStatus = null;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = (v, sign=false) => { const a = Math.abs(v); const s = '$' + a.toLocaleString(undefined,{minimumFractionDigits:a<100?2:0, maximumFractionDigits:2}); return v < -0.004 ? '−' + s : (sign && v > 0.004 ? '+' + s : s); };
+const cents = p => (Math.round(p*1000)/10).toFixed(1);
+const keyOf = n => String(n||'').trim().toLowerCase();
+
+/* ---------- pricing ---------- */
+function risk(s){
+  const Lb = s.boyC - s.prem, Lg = s.girlC - s.prem;
+  let heavy = null;
+  if (Lb > Lg + 1e-9) heavy = 'boy'; else if (Lg > Lb + 1e-9) heavy = 'girl';
+  const worst = Math.max(Lb, Lg);
+  const u = heavy ? Math.min(1, Math.max(0, worst / P.MAXLOSS)) : 0;
+  const f = (Math.exp(P.K*u) - 1) / (Math.exp(P.K) - 1);
+  const skew = Math.min(P.CAP, P.SCALE * f);
+  return { Lb, Lg, heavy, u, skew };
+}
+function quotes(s){
+  const r = risk(s);
+  let boyMid, boyAsk, girlAsk;
+  if (r.heavy === 'boy'){
+    boyMid = P.FAIR + r.skew;
+    boyAsk = boyMid + P.HALF + P.WIDEN*r.u;
+    girlAsk = 1 - (boyMid - P.HALF);
+  } else if (r.heavy === 'girl'){
+    const gm = (1 - P.FAIR) + r.skew;
+    boyMid = 1 - gm;
+    girlAsk = gm + P.HALF + P.WIDEN*r.u;
+    boyAsk = 1 - (gm - P.HALF);
+  } else {
+    boyMid = P.FAIR; boyAsk = P.FAIR + P.HALF; girlAsk = 1 - P.FAIR + P.HALF;
+  }
+  return { ...r, boyMid, boyAsk, girlAsk,
+    boyFull: r.Lb >= P.MAXLOSS - 0.01, girlFull: r.Lg >= P.MAXLOSS - 0.01 };
+}
+function fill(s0, sd, dollars){
+  // Whole order fills at the current quote; skew moves only after the fill.
+  const s = { ...s0 };
+  const q = quotes(s);
+  const p = sd === 'boy' ? q.boyAsk : q.girlAsk;
+  const L = sd === 'boy' ? s.boyC - s.prem : s.girlC - s.prem;
+  const maxD = Math.max(0, (P.MAXLOSS - L) * p / (1 - p));
+  let spent = Math.min(dollars, maxD);
+  const limited = dollars > maxD + 1e-6;
+  spent = Math.floor(spent*100)/100;
+  const c = spent / p;
+  s.prem += spent; if (sd === 'boy') s.boyC += c; else s.girlC += c;
+  return { spent, contracts:c, avg:p, limited, after:s };
+}
+function replay(){
+  const sorted = [...trades].sort((a,b) => (a.ts||0) - (b.ts||0));
+  const s = { boyC:0, girlC:0, prem:0 };
+  const hist = [P.FAIR];
+  for (const t of sorted){
+    s.prem += +t.stake || 0;
+    if (t.side === 'boy') s.boyC += +t.contracts || 0; else s.girlC += +t.contracts || 0;
+    hist.push(quotes(s).boyMid);
+  }
+  return { s, hist, sorted };
+}
+function stakedBy(name){
+  const k = keyOf(name);
+  return trades.filter(t => keyOf(t.name) === k).reduce((a,t) => a + (+t.stake||0), 0);
+}
+
+/* ---------- storage ---------- */
+async function addTrade(t){ await addDoc(collection(fs,'trades'), t); }
+async function removeTrade(id){ await deleteDoc(doc(fs,'trades',id)); }
+async function setConfig(patch){ await setDoc(doc(fs,'config','market'), { ...config, ...patch }); }
+function showBanner(msg){ const b = $('banner'); b.textContent = msg; b.style.display = msg ? 'block' : 'none'; }
+
+/* ---------- render ---------- */
+function render(){
+  const { s, hist, sorted } = replay();
+  const q = quotes(s);
+  const st = config.status;
+  const revealed = st === 'revealed' && (config.outcome === 'boy' || config.outcome === 'girl');
+
+  $('priceBoy').innerHTML = cents(q.boyAsk) + '<small>¢</small>';
+  $('priceGirl').innerHTML = cents(q.girlAsk) + '<small>¢</small>';
+  $('payBoy').textContent = '$10 bet wins ' + money(10 / q.boyAsk);
+  $('payGirl').textContent = '$10 bet wins ' + money(10 / q.girlAsk);
+  const tb = $('tagBoy'), tg = $('tagGirl');
+  tb.className = 'tag' + (q.boyFull ? ' full' : ''); tb.textContent = q.boyFull ? 'Not taking bets' : 'Yes · Boy';
+  tg.className = 'tag' + (q.girlFull ? ' full' : ''); tg.textContent = q.girlFull ? 'Not taking bets' : 'Yes · Girl';
+
+  $('sideBoy').classList.toggle('win', revealed && config.outcome === 'boy');
+  $('sideBoy').classList.toggle('lose', revealed && config.outcome === 'girl');
+  $('sideGirl').classList.toggle('win', revealed && config.outcome === 'girl');
+  $('sideGirl').classList.toggle('lose', revealed && config.outcome === 'boy');
+
+  const bm = q.boyMid;
+  $('mBoy').textContent = Math.round(bm*1000)/10 + '%';
+  $('mGirl').textContent = Math.round((1-bm)*1000)/10 + '%';
+  $('fillB').style.width = (bm*100) + '%';
+  const total = sorted.reduce((a,t) => a + (+t.stake||0), 0);
+  $('mCount').textContent = sorted.length ? `${sorted.length} bet${sorted.length>1?'s':''} · ${money(total)} in` : 'No bets yet';
+  drawSpark(hist);
+
+  const dot = $('statusDot');
+  dot.className = 'dot' + (st === 'closed' ? ' closed' : revealed ? ' revealed' : '');
+  $('statusText').textContent = revealed ? 'Revealed!' : st === 'closed' ? 'Betting is closed' : 'Betting is open';
+
+  const rv = $('reveal');
+  if (revealed){
+    rv.style.display = 'block';
+    rv.className = 'reveal ' + config.outcome;
+    $('revealTitle').textContent = config.outcome === 'boy' ? "It's a Boy!" : "It's a Girl!";
+    $('revealSub').textContent = config.outcome === 'boy' ? 'Tessa is getting a little brother.' : 'Tessa is getting a little sister.';
+    if (!confettiDone){ confettiDone = true; confetti(config.outcome); }
+  } else { rv.style.display = 'none'; confettiDone = false; }
+
+  $('capGuest').textContent = money(config.perPersonCap || 500);
+
+  // feed
+  const feed = $('feed');
+  if (!sorted.length){ feed.innerHTML = '<li class="empty">No bets yet. Be the first.</li>'; }
+  else {
+    feed.innerHTML = [...sorted].reverse().map(t => {
+      const won = revealed && t.side === config.outcome;
+      const lost = revealed && t.side !== config.outcome;
+      const right = revealed
+        ? (won ? `<div class="pos">wins ${money(t.contracts)}</div>` : `<div class="neg">−${money(t.stake).replace('−','')}</div>`)
+        : `<div>${money(t.stake)}</div><div class="meta">wins ${money(t.contracts)}</div>`;
+      const x = isHost ? `<button class="x" data-void="${esc(t.id)}" title="Void bet">✕</button>` : '';
+      return `<li${lost ? ' style="opacity:.55"' : ''}>
+        <span class="pill ${t.side}">${t.side === 'boy' ? 'B' : 'G'}</span>
+        <div><div class="who">${esc(t.name || 'Someone')}</div><div class="meta">Yes ${t.side === 'boy' ? 'Boy' : 'Girl'} @ ${cents(t.avgPrice)}¢</div></div>
+        <div class="amt">${right}</div>${x}</li>`;
+    }).join('');
+  }
+
+  // host
+  $('hostForm').style.display = isHost && st === 'open' ? 'block' : 'none';
+  $('guestInfo').style.display = isHost && st === 'open' ? 'none' : 'block';
+  if (isHost && st !== 'open'){
+    $('guestInfo').querySelector('h2').textContent = revealed ? 'Market settled' : 'Betting closed';
+  } else $('guestInfo').querySelector('h2').textContent = 'How to bet';
+
+  $('hostPanel').style.display = isHost ? 'block' : 'none';
+  if (isHost){
+    const ifBoy = -q.Lb, ifGirl = -q.Lg;
+    $('sPrem').textContent = money(s.prem);
+    const eb = $('sIfBoy'), eg = $('sIfGirl');
+    eb.textContent = money(ifBoy, true); eb.className = 'v ' + (ifBoy >= 0 ? 'pos' : 'neg');
+    eg.textContent = money(ifGirl, true); eg.className = 'v ' + (ifGirl >= 0 ? 'pos' : 'neg');
+    $('sSkew').textContent = (q.skew*100).toFixed(1) + '¢';
+    $('uText').textContent = `Risk used: ${Math.round(q.u*100)}% of $1,000` + (q.heavy ? ` · ${q.heavy === 'boy' ? 'Boy' : 'Girl'} is the busy side, extra spread ${(P.WIDEN*q.u*100).toFixed(1)}¢` : ' · book is balanced');
+    $('uBar').style.width = (q.u*100) + '%';
+    const capEl = $('cap'); if (document.activeElement !== capEl) capEl.value = config.perPersonCap || 500;
+    $('toggleOpen').style.display = revealed ? 'none' : 'inline-flex';
+    $('toggleOpen').textContent = st === 'open' ? 'Close betting' : 'Reopen betting';
+    $('revealBoy').style.display = revealed ? 'none' : 'inline-flex';
+    $('revealGirl').style.display = revealed ? 'none' : 'inline-flex';
+    $('undoReveal').style.display = revealed ? 'inline-flex' : 'none';
+  }
+
+  // results
+  $('results').style.display = revealed ? 'block' : 'none';
+  $('copyRow').style.display = isHost ? 'flex' : 'none';
+  if (revealed){
+    const by = new Map();
+    for (const t of sorted){
+      const k = keyOf(t.name);
+      const r = by.get(k) || { name:t.name || 'Someone', bet:0, pay:0 };
+      r.bet += +t.stake||0; if (t.side === config.outcome) r.pay += +t.contracts||0;
+      by.set(k, r);
+    }
+    const rows = [...by.values()].sort((a,b) => (b.pay-b.bet) - (a.pay-a.bet));
+    let house = 0;
+    $('resBody').innerHTML = rows.map(r => {
+      const pay = Math.round(r.pay*100)/100, net = pay - r.bet; house -= net;
+      return `<tr><td>${esc(r.name)}</td><td class="n">${money(r.bet)}</td><td class="n">${money(pay)}</td><td class="n ${net>=0?'pos':'neg'}">${money(net,true)}</td></tr>`;
+    }).join('') + (isHost ? `<tr><td><b>House (John)</b></td><td></td><td></td><td class="n ${house>=0?'pos':'neg'}"><b>${money(house,true)}</b></td></tr>` : '');
+    window.__resRows = rows;
+  }
+  updateQuote();
+}
+
+function drawSpark(hist){
+  const svg = $('spark');
+  if (hist.length < 2){ svg.innerHTML = `<line x1="0" y1="28" x2="300" y2="28" stroke="#E2D8CC" stroke-dasharray="4 4"/>`; return; }
+  const lo = Math.min(...hist, P.FAIR) - 0.01, hi = Math.max(...hist, P.FAIR) + 0.01;
+  const xs = i => i / (hist.length-1) * 300, ys = v => 52 - (v - lo) / (hi - lo) * 48;
+  const pts = hist.map((v,i) => `${xs(i).toFixed(1)},${ys(v).toFixed(1)}`).join(' ');
+  svg.innerHTML = `<line x1="0" y1="${ys(P.FAIR)}" x2="300" y2="${ys(P.FAIR)}" stroke="#E2D8CC" stroke-dasharray="4 4"/>
+    <polyline points="${pts}" fill="none" stroke="var(--boy)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+    <circle cx="${xs(hist.length-1)}" cy="${ys(hist[hist.length-1])}" r="3" fill="var(--boy)"/>`;
+}
+
+function updateQuote(){
+  const box = $('quote'), btn = $('book');
+  if (!isHost || config.status !== 'open'){ btn.disabled = true; return; }
+  const name = $('name').value.trim();
+  const amt = parseFloat($('amt').value);
+  if (!name || !(amt > 0)){ box.innerHTML = '<span class="muted">Enter a name and an amount to see the fill.</span>'; btn.disabled = true; return; }
+  const cap = config.perPersonCap || 500;
+  const room = Math.max(0, cap - stakedBy(name));
+  const want = Math.min(amt, room);
+  const { s } = replay();
+  const f = fill(s, side, want);
+  const notes = [];
+  if (room <= 0.004){ box.innerHTML = `<span class="warn">${esc(name)} is at the ${money(cap)} limit.</span>`; btn.disabled = true; return; }
+  if (amt > room + 0.004) notes.push(`Trimmed to ${money(room)} (per-person limit).`);
+  if (f.limited) notes.push(f.spent > 0 ? `Side is near the house limit; only ${money(f.spent)} fills.` : 'This side is maxed out.');
+  if (f.spent <= 0){ box.innerHTML = `<span class="warn">${notes.join(' ') || 'Nothing to fill.'}</span>`; btn.disabled = true; return; }
+  box.innerHTML = `<b>${money(f.spent)}</b> on Yes ${side === 'boy' ? 'Boy' : 'Girl'} at <b>${cents(f.avg)}¢</b> → wins <b>${money(f.contracts)}</b> if it's a ${side}.` +
+    (notes.length ? `<br><span class="warn">${notes.join(' ')}</span>` : '');
+  btn.disabled = busy;
+  btn.className = 'btn full ' + side;
+  btn.textContent = `Book ${money(f.spent)} on ${side === 'boy' ? 'Boy' : 'Girl'}`;
+}
+
+/* ---------- events ---------- */
+function setSide(sd){ side = sd; $('tBoy').classList.toggle('on', sd==='boy'); $('tGirl').classList.toggle('on', sd==='girl'); updateQuote(); }
+$('tBoy').onclick = () => setSide('boy');
+$('tGirl').onclick = () => setSide('girl');
+$('name').oninput = updateQuote;
+$('amt').oninput = updateQuote;
+$('chips').onclick = e => { if (e.target.tagName === 'BUTTON'){ $('amt').value = e.target.textContent; updateQuote(); } };
+
+$('book').onclick = async () => {
+  if (busy) return;
+  const name = $('name').value.trim(); const amt = parseFloat($('amt').value);
+  if (!name || !(amt > 0) || config.status !== 'open') return;
+  const room = Math.max(0, (config.perPersonCap||500) - stakedBy(name));
+  const { s } = replay();
+  const f = fill(s, side, Math.min(amt, room));
+  if (f.spent <= 0) return;
+  busy = true; $('book').disabled = true;
+  try{
+    await addTrade({ name, side, stake:f.spent, contracts:Math.round(f.contracts*10000)/10000, avgPrice:Math.round(f.avg*10000)/10000, ts:Date.now() });
+    $('name').value = ''; $('amt').value = '';
+  } catch(e){ showBanner('That bet did not save. Check your connection and try again.'); }
+  busy = false; updateQuote();
+};
+
+function armed(btn, action){
+  if (btn.dataset.armed === '1'){ btn.dataset.armed = ''; btn.classList.remove('armed'); btn.textContent = btn.dataset.label; action(); return; }
+  btn.dataset.label = btn.dataset.label || btn.textContent;
+  btn.dataset.armed = '1'; btn.classList.add('armed'); btn.textContent = btn.dataset.confirm || 'Tap again';
+  setTimeout(() => { if (btn.dataset.armed === '1'){ btn.dataset.armed=''; btn.classList.remove('armed'); btn.textContent = btn.dataset.label; } }, 3500);
+}
+$('toggleOpen').onclick = () => setConfig({ status: config.status === 'open' ? 'closed' : 'open' }).catch(()=>showBanner('Could not update the market.'));
+$('revealBoy').onclick = e => armed(e.currentTarget, () => setConfig({ status:'revealed', outcome:'boy' }));
+$('revealGirl').onclick = e => armed(e.currentTarget, () => setConfig({ status:'revealed', outcome:'girl' }));
+$('undoReveal').onclick = e => armed(e.currentTarget, () => setConfig({ status:'closed', outcome:null }));
+$('cap').onchange = e => { const v = Math.max(1, Math.round(+e.target.value||500)); setConfig({ perPersonCap:v }).catch(()=>{}); };
+$('feed').onclick = e => {
+  const b = e.target.closest('[data-void]'); if (!b) return;
+  if (b.dataset.armed === '1'){ removeTrade(b.dataset.void).catch(()=>showBanner('Could not void that bet.')); return; }
+  b.dataset.armed = '1'; b.classList.add('armed'); b.textContent = 'Void?';
+  setTimeout(() => { b.dataset.armed=''; b.classList.remove('armed'); b.textContent = '✕'; }, 3000);
+};
+$('copyRes').onclick = async () => {
+  const rows = window.__resRows || [];
+  const txt = `It's a ${config.outcome === 'boy' ? 'Boy' : 'Girl'}! Settle up:\n` + rows.map(r => {
+    const net = Math.round((r.pay - r.bet)*100)/100;
+    return `${r.name}: ${net >= 0 ? 'John pays you ' + money(Math.round(r.pay*100)/100) : 'paid ' + money(r.bet) + ', lost'}`;
+  }).join('\n');
+  try{ await navigator.clipboard.writeText(txt); $('copyMsg').textContent = 'Copied.'; }
+  catch(e){ $('copyMsg').textContent = 'Copy was blocked. Select the table instead.'; }
+};
+
+/* ---------- confetti ---------- */
+function confetti(outcome){
+  const cv = $('confetti'), ctx = cv.getContext('2d');
+  const W = cv.width = innerWidth, H = cv.height = innerHeight;
+  const cols = outcome === 'boy' ? ['#3F78BF','#7FAEE6','#2A5A96','#FFFFFF','#C9A24B'] : ['#D45F86','#F3A3BE','#A8406A','#FFFFFF','#C9A24B'];
+  const ps = Array.from({length:220}, () => ({ x:Math.random()*W, y:-20-Math.random()*H*0.6, w:6+Math.random()*6, h:8+Math.random()*10, vy:2+Math.random()*3.5, vx:-1.5+Math.random()*3, r:Math.random()*6, vr:-0.2+Math.random()*0.4, c:cols[(Math.random()*cols.length)|0] }));
+  const t0 = performance.now();
+  (function frame(t){
+    ctx.clearRect(0,0,W,H);
+    for (const p of ps){ p.x += p.vx; p.y += p.vy; p.r += p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); }
+    if (t - t0 < 6000) requestAnimationFrame(frame); else ctx.clearRect(0,0,W,H);
+  })(t0);
+}
+
+/* ---------- boot ---------- */
+render();
+let gotTrades = false;
+const loadTimer = setTimeout(() => { if (!gotTrades) showBanner("Can't reach the market yet. Check your connection."); }, 10000);
+onSnapshot(collection(fs,'trades'), snap => {
+  trades = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  gotTrades = true; clearTimeout(loadTimer); showBanner('');
+  render();
+}, err => { clearTimeout(loadTimer); showBanner('Live updates stopped. Reload the page to reconnect.'); });
+onSnapshot(doc(fs,'config','market'), snap => {
+  config = snap.exists() ? { ...DEFAULT_CONFIG, ...snap.data() } : { ...DEFAULT_CONFIG };
+  render();
+}, err => {});
+onAuthStateChanged(auth, u => {
+  isHost = !!(u && u.email === HOST_EMAIL && u.emailVerified);
+  const link = $('hostLink');
+  link.textContent = u ? (isHost ? 'Host: signed in · Sign out' : 'Sign out') : 'Host sign-in';
+  if (u && !isHost) showBanner('That account is not the host. Bets can only be booked by John.');
+  render();
+});
+$('hostLink').onclick = async e => {
+  e.preventDefault();
+  try{
+    if (auth.currentUser) await signOut(auth);
+    else await signInWithPopup(auth, new GoogleAuthProvider());
+  } catch(err){ showBanner('Sign-in did not finish. Try again.'); }
+};
+</script>
+</body>
+</html>
